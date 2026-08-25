@@ -37,7 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       ready,
       signIn: (email, name) => {
-        const next = { email, name: name || email.split("@")[0].replace(/\W/g, " ") || "Alex Morgan" };
+        const handle = (email.split("@")[0] ?? "").replace(/\W/g, " ").trim();
+        const next = { email, name: name || handle || "Alex Morgan" };
         localStorage.setItem(KEY, JSON.stringify(next));
         setUser(next);
       },
