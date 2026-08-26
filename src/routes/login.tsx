@@ -49,7 +49,7 @@ function LoginPage() {
                 <input type="checkbox" defaultChecked className="accent-[oklch(0.75_0.14_163)]" />
                 Keep me signed in
               </label>
-              <span className="cursor-pointer hover:text-foreground">Forgot password?</span>
+              <Link to="/forgot-password" className="cursor-pointer hover:text-foreground">Forgot password?</Link>
             </div>
             <button className="group flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.02]">
               Enter Habitforge

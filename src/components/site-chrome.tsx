@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/brand";
+import { useAuth, initials } from "@/lib/auth";
 
 const links = [
   { to: "/", label: "Home" },
@@ -9,7 +10,31 @@ const links = [
   { to: "/about", label: "About" },
 ] as const;
 
+const footerLinks = {
+  Product: [
+    { to: "/features", label: "Features" },
+    { to: "/pricing", label: "Pricing" },
+    { to: "/challenges", label: "Challenges" },
+    { to: "/changelog", label: "Changelog" },
+  ],
+  Company: [
+    { to: "/about", label: "About" },
+    { to: "/careers", label: "Careers" },
+    { to: "/press", label: "Press" },
+    { to: "/contact", label: "Contact" },
+  ],
+  Legal: [
+    { to: "/privacy", label: "Privacy" },
+    { to: "/terms", label: "Terms" },
+    { to: "/security", label: "Security" },
+    { to: "/cookies", label: "Cookies" },
+  ],
+} as const;
+
 export function SiteLayout({ children }: { children: ReactNode }) {
+  const { user, ready } = useAuth();
+  const name = user?.name ?? "Alex Morgan";
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
@@ -29,18 +54,17 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className="rounded-full px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Log in
-            </Link>
-            <Link
-              to="/signup"
-              className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]"
-            >
-              Start free
-            </Link>
+            {ready && user ? (
+              <>
+                <Link to="/dashboard" className="rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary">Dashboard</Link>
+                <span className="grid size-9 place-items-center rounded-full bg-mint-soft font-mono text-xs text-ink">{initials(name)}</span>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="rounded-full px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground">Log in</Link>
+                <Link to="/signup" className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]">Start free</Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -53,9 +77,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               A quiet place to build the days you want, one repetition at a time.
             </p>
           </div>
-          <FooterCol title="Product" items={["Features", "Pricing", "Challenges", "Changelog"]} />
-          <FooterCol title="Company" items={["About", "Careers", "Press", "Contact"]} />
-          <FooterCol title="Legal" items={["Privacy", "Terms", "Security", "Cookies"]} />
+          {Object.entries(footerLinks).map(([title, items]) => (
+            <FooterCol key={title} title={title} items={items} />
+          ))}
         </div>
         <div className="border-t border-sidebar-border px-5 py-6 text-center font-mono text-xs tracking-widest text-sidebar-foreground/50">
           © {new Date().getFullYear()} HABITFORGE — SMALL STEPS, REAL MOMENTUM
@@ -65,14 +89,16 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   );
 }
 
-function FooterCol({ title, items }: { title: string; items: string[] }) {
+function FooterCol({ title, items }: { title: string; items: readonly { to: string; label: string }[] }) {
   return (
     <div>
       <p className="label-mono !text-sidebar-foreground/50">{title}</p>
       <ul className="mt-4 space-y-2 text-sm text-sidebar-foreground/75">
-        {items.map((i) => (
-          <li key={i} className="cursor-pointer transition-colors hover:text-mint">
-            {i}
+        {items.map((item) => (
+          <li key={item.to}>
+            <Link to={item.to} className="transition-colors hover:text-mint">
+              {item.label}
+            </Link>
           </li>
         ))}
       </ul>

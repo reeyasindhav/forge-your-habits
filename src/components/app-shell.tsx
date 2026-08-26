@@ -36,6 +36,7 @@ export function AppShell({
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const name = user?.name ?? "Alex Morgan";
 
   const sidebar = (
@@ -88,10 +89,7 @@ export function AppShell({
           </div>
           <button
             aria-label="Sign out"
-            onClick={() => {
-              signOut();
-              navigate({ to: "/", replace: true });
-            }}
+            onClick={() => setConfirmOpen(true)}
             className="text-sidebar-foreground/60 transition-colors hover:text-sidebar-foreground"
           >
             <LogOut className="size-4" />
@@ -143,6 +141,29 @@ export function AppShell({
         </header>
         <main className={cn("px-5 pb-16 pt-6 sm:px-8")}>{children}</main>
       </div>
+
+      {confirmOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-ink/50 animate-fade-in" onClick={() => setConfirmOpen(false)} />
+          <div className="surface relative w-full max-w-sm animate-fade-up p-6">
+            <h3 className="text-lg font-semibold">Sign out?</h3>
+            <p className="mt-2 text-sm text-muted-foreground">You will be returned to the home page. Your data will stay saved.</p>
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button onClick={() => setConfirmOpen(false)} className="rounded-full border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary">Cancel</button>
+              <button
+                onClick={() => {
+                  setConfirmOpen(false);
+                  signOut();
+                  navigate({ to: "/", replace: true });
+                }}
+                className="rounded-full bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground transition-transform hover:scale-[1.03]"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
